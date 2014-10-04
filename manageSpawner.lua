@@ -1,22 +1,22 @@
-os.loadAPI("redString")
-os.loadAPI("ui")
-os.loadAPI("sovietProtocol")
+os.loadAPI("api/redString")
+os.loadAPI("api/ui")
+os.loadAPI("api/sovietProtocol")
 
-sovietProtocol.init("top", 1, 1)
-spawner = peripheral.wrap("tile_mfr_machine_autospawner_name_0")
-energyStorage = peripheral.wrap("cofh_thermalexpansion_energycell_0")
-chest = peripheral.wrap("container_chest_0")
+local spawnNet = sovietProtocol.Protocol:new("spawnNet", 1, 1, "top")
+local spawner = peripheral.find("tile_mfr_machine_autospawner_name")
+local energyStorage = peripheral.find("cofh_thermalexpansion_energycell")
+local chest = peripheral.find("container_chest")
 
-MENU_SCREEN = "monitor_3"
-INFO_SCREEN = "monitor_1"
-POWER_SCREEN = "monitor_2"
-FLUID_SCREEN = "monitor_0"
+local MENU_SCREEN = "monitor_3"
+local INFO_SCREEN = "monitor_1"
+local POWER_SCREEN = "monitor_2"
+local FLUID_SCREEN = "monitor_0"
 
-mobs = {}
-currentMob = nil
-menu = peripheral.wrap(MENU_SCREEN)
+local mobs = {}
+local currentMob = nil
+local menu = peripheral.wrap(MENU_SCREEN)
 
-on = false
+local on = false
 
 
 function emptyMobSpawner()
@@ -43,12 +43,12 @@ end
 
 function enableSpawning()
 	on = true
-	sovietProtocol.send(1, 1, "spawner_on", "", "")
+	spawnNet:send("spawner_on")
 end
 
 function disableSpawning()
 	on = false
-	sovietProtocol.send(1, 1, "spawner_off", "", "")
+	spawnNet:send("spawner_off")
 end
 
 disableSpawning()

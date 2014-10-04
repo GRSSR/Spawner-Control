@@ -1,0 +1,6 @@
+api:sovietProtocol
+api:ui
+api:redString
+
+manage manageSpawner.lua /spawner/manage
+stat statSpawner.lua /spawner/stat

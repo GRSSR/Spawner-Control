@@ -1,18 +1,19 @@
-os.loadAPI("redString")
-os.loadAPI("sovietProtocol")
+os.loadAPI("api/redString")
+os.loadAPI("api/sovietProtocol")
+os.loadAPI("api/ui")
 
-sovietProtocol.init("top", 1, 1)
-spawner = peripheral.wrap("tile_mfr_machine_autospawner_name_0")
-energyStorage = peripheral.wrap("cofh_thermalexpansion_energycell_0")
-chest = peripheral.wrap("container_chest_0")
+local spawnNet = sovietProtocol.Protocol:new("spawnNet", 1, 1, "top")
+local spawner = peripheral.find("tile_mfr_machine_autospawner_name")
+local energyStorage = peripheral.find("cofh_thermalexpansion_energycell")
+local chest = peripheral.find("container_chest")
 
-MENU_SCREEN = "monitor_3"
-INFO_SCREEN = "monitor_1"
-POWER_SCREEN = "monitor_2"
-FLUID_SCREEN = "monitor_0"
+local MENU_SCREEN = "monitor_3"
+local INFO_SCREEN = "monitor_1"
+local POWER_SCREEN = "monitor_2"
+local FLUID_SCREEN = "monitor_0"
 
-powerIndicator = peripheral.wrap(POWER_SCREEN)
-fluidIndicator = peripheral.wrap(FLUID_SCREEN)
+local powerIndicator = peripheral.wrap(POWER_SCREEN)
+local fluidIndicator = peripheral.wrap(FLUID_SCREEN)
 
 print("starting Stat Monitoring")
 
@@ -21,6 +22,9 @@ function getEnergyFraction(storage)
 end
 
 function getFluidFraction(tank)
+	if not tank.amount then
+		tank.amount = 0
+	end
 	return tank.amount/tank.capacity
 end
 
@@ -30,67 +34,10 @@ function getSystemStatus()
 	return status
 end
 
-function resetScreen(screen)
-	local x,y = screen.getSize()
-	for xpos=1, x do
-		for ypos=1, y do
-			screen.setCursorPos(xpos,ypos)
-			screen.setBackgroundColor(colors.black)
-			screen.write(" ")
-		end
-	end
-end
-
-function pad(output, length)
-	for i =1, length do 
-		output.write(" ")
-	end
-end
-
-Button ={
-	width = 1,
-	height = 1,
-	screen = nil,
-	text = "",
-	x = 1,
-	y = 1,
-	colour = colors.white,
-	callback = nil
-}
-
-function Button:new()
-	o = {}
-	setmetatable(o, self)
-	self.__index = self
-	return o
-end
-
-function Button:draw()
-	self.screen.setCursorPos(self.x, self.y)
-	self.screen.setBackgroundColor(self.colour)
-	length = string.len(self.text)
-	textLine = self.y + math.floor(self.height/2)
-	for i = self.y, self.y + self.height-1 do
-		buttonMapping[i] = self
-		self.screen.setCursorPos(self.x, i)
-		padding = math.floor((self.width - length)/2)
-		if i == textLine then
-			pad(self.screen, padding)
-			self.screen.write(self.text)
-			pad(self.screen, self.width - (padding+length))
-		else
-			pad(self.screen, self.width)
-		end
-	end
-end
-
-function Button:init(screen, text, x, y, width, height, colour, callback)
-
-end
 
 function drawBar(screen, fraction, colour)
 	screen.clear()
-	resetScreen(screen)
+	ui.resetScreen(screen)
 	screen.setBackgroundColor(colour)
 	screen.setTextScale(0.5)
 
@@ -102,7 +49,7 @@ function drawBar(screen, fraction, colour)
 
 	for i=0, linesToFill do
 		screen.setCursorPos(1, y-i)
-		pad(screen, x)
+		ui.pad(screen, x)
 	end
 end
 
