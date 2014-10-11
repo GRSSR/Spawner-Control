@@ -21,11 +21,21 @@ function getEnergyFraction(storage)
 	return storage.getEnergyStored("")/storage.getMaxEnergyStored("")
 end
 
-function getFluidFraction(tank)
-	if not tank.amount then
-		tank.amount = 0
+function getFluidFraction(tanks)
+	local capacity = 0
+	local amount = 0
+	if type(tanks) ~= "table" then
+		local tanks = {tanks}
 	end
-	return tank.amount/tank.capacity
+	for key, tank in pairs(tanks) do
+		if not tank.amount then
+			tank.amount = 0
+		end
+		amount = amount + tank.amount
+		capacity = capacity + tank.capacity
+
+	end
+	return amount/capacity
 end
 
 function getSystemStatus()
@@ -34,6 +44,17 @@ function getSystemStatus()
 	return status
 end
 
+function getAttachedTanks() 
+	local tanks = {}
+	local candidate
+	for key, periph in pairs(peripheral.getNames()) do
+		candidate = peripheral.wrap(periph)
+		if candidate.getTankInfo ~= nil then
+			tanks[#tanks+1] = candidate.getTankInfo("")[1]
+		end
+	end
+	return tanks
+end
 
 function drawBar(screen, fraction, colour)
 	screen.clear()
@@ -62,7 +83,7 @@ function drawPower()
 end
 
 function drawFluid()
-	local fluid = getFluidFraction(spawner.getTankInfo("")[1])
+	local fluid = getFluidFraction(getAttachedTanks())
 	if fluid ~= previousFluid then
 		drawBar(fluidIndicator, fluid, colors.green)
 		previousFluid = fluid
